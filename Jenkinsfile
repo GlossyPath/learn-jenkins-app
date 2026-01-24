@@ -21,13 +21,20 @@
               }
           }
 
-          stage('Test'){
-            steps{
-            sh '''
-              test -f build/index.html
-              npm test
-            '''
-            }
+          stage('Test') {
+           agent {
+            docker {
+              image 'node:18-alpine'
+              reuseNode true
+                    }
+                  }
+              steps {
+              echo 'Testing starting'
+              sh '''
+                test -f build/index.html   //looking for a file with test -f
+                npm test
+              '''
+              }
           }
       }
   }
