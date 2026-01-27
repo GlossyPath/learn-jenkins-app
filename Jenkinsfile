@@ -6,6 +6,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-alpine'
+                    //guarda todo en el mismo workspace
                     reuseNode true
                 }
             }
@@ -30,12 +31,33 @@ pipeline {
             }
 
             steps {
+            //test - f es para buscar un archivo o carpeta en concreto
+            // si ponemos delante de un comando de sh # no correra ese comando
                 sh '''
                     test -f build/index.html
                     npm test
                 '''
             }
         }
+
+        stage('Test') {
+                    agent {
+                        docker {
+                            image 'mcr.microsoft.com/playwright:v1.58.0-noble'
+                            reuseNode true
+                        }
+                    }
+
+                    steps {
+                    //test - f es para buscar un archivo o carpeta en concreto
+                    // si ponemos delante de un comando de sh # no correra ese comando
+                        sh '''
+                            npm install -g serve
+                            serve -s build
+                            npx playwright test
+                        '''
+                    }
+                }
     }
 
     post {
